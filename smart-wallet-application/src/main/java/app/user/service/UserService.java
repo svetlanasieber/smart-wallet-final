@@ -96,8 +96,7 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    // В началото се изпълнява веднъж този метод и резултата се пази в кеш
-    // Всяко следващо извикване на този метод ще се чете резултата от кеша и няма да се извиква четенето от базата
+ 
     @Cacheable("users")
     public List<User> getAllUsers() {
 
@@ -114,15 +113,6 @@ public class UserService implements UserDetailsService {
 
         User user = getById(userId);
 
-        // НАЧИН 1:
-//        if (user.isActive()){
-//            user.setActive(false);
-//        } else {
-//            user.setActive(true);
-//        }
-
-        // false -> true
-        // true -> false
         user.setActive(!user.isActive());
         userRepository.save(user);
     }
@@ -141,8 +131,6 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    // Всеки пък, когато потребител се логва, Spring Security ще извиква този метод
-    // за да вземе детайлите на потребителя с този username
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
