@@ -19,7 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.UUID;
 
-@Controller
+@Controller 
 @RequestMapping("/subscriptions")
 public class SubscriptionController {
 
