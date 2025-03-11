@@ -34,7 +34,7 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(nullable = false)
+    @Column(nullable = false) 
     private BigDecimal balanceLeft;
 
     @Column(nullable = false)
