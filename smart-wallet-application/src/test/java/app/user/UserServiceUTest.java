@@ -36,11 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-// 1. Create the test class
-// 2. Annotate the class with @ExtendWith(MockitoExtension.class)
-// 3. Get the class you want to test
-// 4. Get all dependencies of that class and annotate them with @Mock
-// 5. Inject all those dependencies to the class we test with annotation @InjectMocks
+
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUTest {
@@ -63,17 +59,17 @@ public class UserServiceUTest {
     @MethodSource("userRolesArguments")
     void whenChangeUserRole_theCorrectRoleIsAssigned(UserRole currentUserRole, UserRole expectedUserRole) {
 
-        // Given
+      
         UUID userId = UUID.randomUUID();
         User user = User.builder()
                 .role(currentUserRole)
                 .build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
+      
         userService.switchRole(userId);
 
-        // Then
+    
         assertEquals(expectedUserRole, user.getRole());
     }
 
@@ -88,32 +84,31 @@ public class UserServiceUTest {
     @Test
     void givenExistingUsersInDatabase_whenGetAllUsers_thenReturnThemAll() {
 
-        // Give
         List<User> userList = List.of(new User(), new User());
         when(userRepository.findAll()).thenReturn(userList);
 
-        // When
+     
         List<User> users = userService.getAllUsers();
 
-        // Then
+   
         assertThat(users).hasSize(2);
     }
 
-    // Switch status method
+ 
     @Test
     void givenUserWithStatusActive_whenSwitchStatus_thenUserStatusBecomeInactive() {
 
-        // Given
+       
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .isActive(true)
                 .build();
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        // When
+      
         userService.switchStatus(user.getId());
 
-        // Then
+      
         assertFalse(user.isActive());
         verify(userRepository, times(1)).save(user);
     }
@@ -121,35 +116,34 @@ public class UserServiceUTest {
     @Test
     void givenUserWithStatusInactive_whenSwitchStatus_thenUserStatusBecomeActive() {
 
-        // Given
+      
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .isActive(false)
                 .build();
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        // When
+       
         userService.switchStatus(user.getId());
 
-        // Then
+    
         assertTrue(user.isActive());
         verify(userRepository, times(1)).save(user);
     }
 
-    // Register
-    // Test 1: When user exist with this username -> exception is thrown
+
     @Test
     void givenExistingUsername_whenRegister_thenExceptionIsThrown() {
 
-        // Given
+     
         RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("Vik123")
-                .password("123123")
-                .country(Country.BULGARIA)
+                .username("")
+                .password("")
+                .country(Country.X)
                 .build();
         when(userRepository.findByUsername(any())).thenReturn(Optional.of(new User()));
 
-        // When & Then
+        
         assertThrows(UsernameAlreadyExistException.class, () -> userService.register(registerRequest));
         verify(userRepository, never()).save(any());
         verify(subscriptionService, never()).createDefaultSubscription(any());
@@ -157,15 +151,15 @@ public class UserServiceUTest {
         verify(notificationService, never()).saveNotificationPreference(any(UUID.class), anyBoolean(), anyString());
     }
 
-    // Test 2: Happy path Registration
+  
     @Test
     void givenHappyPath_whenRegister() {
 
         // Given
         RegisterRequest registerRequest = RegisterRequest.builder()
-                .username("Vik123")
-                .password("123123")
-                .country(Country.BULGARIA)
+                .username("")
+                .password("")
+                .country(Country.X)
                 .build();
         User user = User.builder()
                 .id(UUID.randomUUID())
@@ -175,24 +169,23 @@ public class UserServiceUTest {
         when(subscriptionService.createDefaultSubscription(user)).thenReturn(new Subscription());
         when(walletService.initilizeFirstWallet(user)).thenReturn(new Wallet());
 
-        // When
+      
         User registeredUser = userService.register(registerRequest);
 
-        // Then
+       
         assertThat(registeredUser.getSubscriptions()).hasSize(1);
         assertThat(registeredUser.getWallets()).hasSize(1);
         verify(notificationService, times(1)).saveNotificationPreference(user.getId(), false, null);
     }
 
-    // Test 2: When User does not exist - then throws exception
     @Test
     void givenMissingUserFromDatabase_whenLoadUserByUsername_thenExceptionIsThrown() {
 
-        // Given
-        String username = "Vik123";
+       
+        String username = "";
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // When & Then
+    
         assertThrows(DomainException.class, () -> userService.loadUserByUsername(username));
     }
 
@@ -327,3 +320,4 @@ public class UserServiceUTest {
         assertThat(user.getRole()).isEqualTo(UserRole.ADMIN);
     }
 }
+
