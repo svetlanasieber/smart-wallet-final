@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-// url - основен ednpoint
+
 @FeignClient(name = "notification-svc", url = "http://localhost:8081/api/v1/notifications")
 public interface NotificationClient {
 
@@ -39,3 +39,4 @@ public interface NotificationClient {
     @PutMapping
     ResponseEntity<Void> retryFailedNotifications(@RequestParam(name = "userId") UUID userId);
 }
+
