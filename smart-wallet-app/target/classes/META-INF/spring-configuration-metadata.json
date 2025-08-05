@@ -1,0 +1,52 @@
+{
+  "groups": [
+    {
+      "name": "domain.subscription.properties",
+      "type": "app.subscription.property.SubscriptionProperties",
+      "sourceType": "app.subscription.property.SubscriptionProperties"
+    },
+    {
+      "name": "domain.user.properties",
+      "type": "app.user.property.UserProperties",
+      "sourceType": "app.user.property.UserProperties"
+    },
+    {
+      "name": "domain.wallet.properties",
+      "type": "app.wallet.property.WalletProperties",
+      "sourceType": "app.wallet.property.WalletProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "domain.subscription.properties.default-period",
+      "type": "app.subscription.model.SubscriptionPeriod",
+      "sourceType": "app.subscription.property.SubscriptionProperties"
+    },
+    {
+      "name": "domain.subscription.properties.upgrade-options",
+      "type": "java.util.Map<app.subscription.model.SubscriptionType,app.subscription.property.SubscriptionProperties$UpgradeOption>",
+      "sourceType": "app.subscription.property.SubscriptionProperties"
+    },
+    {
+      "name": "domain.user.properties.active-by-default",
+      "type": "java.lang.Boolean",
+      "sourceType": "app.user.property.UserProperties"
+    },
+    {
+      "name": "domain.user.properties.default-role",
+      "type": "app.user.model.UserRole",
+      "sourceType": "app.user.property.UserProperties"
+    },
+    {
+      "name": "domain.wallet.properties.default-status",
+      "type": "app.wallet.model.WalletStatus",
+      "sourceType": "app.wallet.property.WalletProperties"
+    },
+    {
+      "name": "domain.wallet.properties.initial-balance",
+      "type": "java.math.BigDecimal",
+      "sourceType": "app.wallet.property.WalletProperties"
+    }
+  ],
+  "hints": []
+}
