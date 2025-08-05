@@ -1,6 +1,8 @@
 package app.user.service;
 
 import app.exception.DomainException;
+import app.exception.UsernameAlreadyExistException;
+import app.notification.service.NotificationService;
 import app.security.AuthenticationMetadata;
 import app.subscription.model.Subscription;
 import app.subscription.service.SubscriptionService;
@@ -35,17 +37,20 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final SubscriptionService subscriptionService;
     private final WalletService walletService;
+    private final NotificationService notificationService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
                        SubscriptionService subscriptionService,
-                       WalletService walletService) {
+                       WalletService walletService,
+                       NotificationService notificationService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.subscriptionService = subscriptionService;
         this.walletService = walletService;
+        this.notificationService = notificationService;
     }
 
     @CacheEvict(value = "users", allEntries = true)
@@ -54,7 +59,7 @@ public class UserService implements UserDetailsService {
 
         Optional<User> optionUser = userRepository.findByUsername(registerRequest.getUsername());
         if (optionUser.isPresent()) {
-            throw new DomainException("Username [%s] already exist.".formatted(registerRequest.getUsername()));
+            throw new UsernameAlreadyExistException("Username [%s] already exist.".formatted(registerRequest.getUsername()));
         }
 
         User user = userRepository.save(initializeUser(registerRequest));
@@ -64,6 +69,9 @@ public class UserService implements UserDetailsService {
 
         Wallet standardWallet = walletService.initilizeFirstWallet(user);
         user.setWallets(List.of(standardWallet));
+
+        // Persist new notification preference with isEnabled = false
+        notificationService.saveNotificationPreference(user.getId(), false, null);
 
         log.info("Successfully create new user account for username [%s] and id [%s]".formatted(user.getUsername(), user.getId()));
 
@@ -79,6 +87,12 @@ public class UserService implements UserDetailsService {
         user.setLastName(userEditRequest.getLastName());
         user.setEmail(userEditRequest.getEmail());
         user.setProfilePicture(userEditRequest.getProfilePicture());
+
+        if (!userEditRequest.getEmail().isBlank()) {
+            notificationService.saveNotificationPreference(userId, true, userEditRequest.getEmail());
+        } else {
+            notificationService.saveNotificationPreference(userId, false, null);
+        }
 
         userRepository.save(user);
     }
@@ -96,7 +110,8 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
- 
+    // В началото се изпълнява веднъж този метод и резултата се пази в кеш
+    // Всяко следващо извикване на този метод ще се чете резултата от кеша и няма да се извиква четенето от базата
     @Cacheable("users")
     public List<User> getAllUsers() {
 
@@ -113,6 +128,15 @@ public class UserService implements UserDetailsService {
 
         User user = getById(userId);
 
+        // НАЧИН 1:
+//        if (user.isActive()){
+//            user.setActive(false);
+//        } else {
+//            user.setActive(true);
+//        }
+
+        // false -> true
+        // true -> false
         user.setActive(!user.isActive());
         userRepository.save(user);
     }
@@ -131,6 +155,8 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    // Всеки пък, когато потребител се логва, Spring Security ще извиква този метод
+    // за да вземе детайлите на потребителя с този username
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 

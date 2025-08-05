@@ -2,7 +2,6 @@ package app.web;
 
 import app.security.AuthenticationMetadata;
 import app.user.model.User;
-import app.user.model.UserRole;
 import app.user.service.UserService;
 import app.web.dto.UserEditRequest;
 import app.web.mapper.DtoMapper;
@@ -29,6 +28,10 @@ public class UserController {
         this.userService = userService;
     }
 
+    // hasAnyRole - проверяваме за една от следните роли
+    // hasRole - проверяваме за една конкретна роля
+    // hasAuthority - проверяваме за един permission
+    // hasAnyAuthority - проверяваме за един от следните permissions
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView getAllUsers(@AuthenticationPrincipal AuthenticationMetadata authenticationMetadata) {
@@ -42,7 +45,7 @@ public class UserController {
         return modelAndView;
     }
 
-
+    // Endpoint:  '/users/{placeholder}/profile'- unique (just single in my app)
     @GetMapping("/{id}/profile")
     public ModelAndView getProfileMenu(@PathVariable UUID id) {
 
@@ -89,4 +92,3 @@ public class UserController {
         return "redirect:/users";
     }
 }
-

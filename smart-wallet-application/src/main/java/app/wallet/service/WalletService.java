@@ -1,6 +1,7 @@
 package app.wallet.service;
 
 import app.exception.DomainException;
+import app.notification.service.NotificationService;
 import app.subscription.model.Subscription;
 import app.subscription.model.SubscriptionType;
 import app.transaction.model.Transaction;
@@ -48,6 +49,9 @@ public class WalletService {
         List<Wallet> allUserWallets = walletRepository.findAllByOwnerUsername(user.getUsername());
         Subscription activeSubscription = user.getSubscriptions().get(0);
 
+        // Pesho
+        // Subs: Premium
+        // Wallets: 2
 
         boolean isDefaultPlanAndMaxWalletsUnlocked = activeSubscription.getType() == SubscriptionType.DEFAULT && allUserWallets.size() == 1;
         boolean isPremiumPlanAndMaxWalletsUnlocked = activeSubscription.getType() == SubscriptionType.PREMIUM && allUserWallets.size() == 2;
@@ -143,6 +147,11 @@ public class WalletService {
                     "Invalid criteria for transfer");
         }
 
+        // Money Transfer
+        // Ivan -> Gosho | 20 EUR
+        // Ivan -20.00 EUR
+        // Gosho +20.00 EUR
+
         Transaction withdrawal = charge(sender, senderWallet.getId(), transferRequest.getAmount(), transferDescription);
         if (withdrawal.getStatus() == TransactionStatus.FAILED) {
             return withdrawal;
@@ -201,7 +210,7 @@ public class WalletService {
 
         walletRepository.save(wallet);
 
-     
+        // Успешно плащане
         System.out.printf("Thread [%s]: Code in WalletService.class\n", Thread.currentThread().getName());
         PaymentNotificationEvent event = PaymentNotificationEvent.builder()
                 .userId(user.getId())
@@ -209,7 +218,8 @@ public class WalletService {
                 .email(user.getEmail())
                 .amount(amount)
                 .build();
-      
+        // Ако искате да публикувате евент, просто разкоментирайте реда по-долу
+        // eventPublisher.publishEvent(event);
 
         return transactionService.createNewTransaction(user,
                 wallet.getId().toString(),
