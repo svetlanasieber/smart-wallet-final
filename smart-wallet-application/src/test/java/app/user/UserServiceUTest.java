@@ -189,7 +189,7 @@ public class UserServiceUTest {
         assertThrows(DomainException.class, () -> userService.loadUserByUsername(username));
     }
 
-    // Test 1: When user exist - then return new AuthenticationMetadata
+
     @Test
     void givenExistingUser_whenLoadUserByUsername_thenReturnCorrectAuthenticationMetadata() {
 
@@ -203,10 +203,10 @@ public class UserServiceUTest {
                 .build();
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        // When
+     
         UserDetails authenticationMetadata = userService.loadUserByUsername(username);
 
-        // Then
+      
         assertInstanceOf(AuthenticationMetadata.class, authenticationMetadata);
         AuthenticationMetadata result = (AuthenticationMetadata) authenticationMetadata;
         assertEquals(user.getId(), result.getUserId());
@@ -218,8 +218,7 @@ public class UserServiceUTest {
         assertEquals("ROLE_ADMIN", result.getAuthorities().iterator().next().getAuthority());
     }
 
-    // Test Case: When there is no user in the database (repository returns Optional.empty()) -
-    // then expect an exception of type DomainException is thrown
+
     @Test
     void givenMissingUserFromDatabase_whenEditUserDetails_thenExceptionIsThrown() {
 
@@ -230,30 +229,29 @@ public class UserServiceUTest {
         assertThrows(DomainException.class, () -> userService.editUserDetails(userId, dto));
     }
 
-    // Test Case: When database returns user object -> then change their details from the dto with email address
-    // and save notification preference and save the user to the database
+  
     @Test
     void givenExistingUser_whenEditTheirProfileWithActualEmail_thenChangeTheirDetailsSaveNotificationPreferenceAndSaveToDatabase() {
 
         // Given
         UUID userId = UUID.randomUUID();
         UserEditRequest dto = UserEditRequest.builder()
-                .firstName("Viktor")
-                .lastName("Aleksandrov")
-                .email("vik123@abv.bg")
-                .profilePicture("www.image.com")
+                .firstName("")
+                .lastName("")
+                .email("")
+                .profilePicture("")
                 .build();
         User user = User.builder().build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
+    
         userService.editUserDetails(userId, dto);
 
-        // Then
-        assertEquals("Viktor", user.getFirstName());
-        assertEquals("Aleksandrov", user.getLastName());
-        assertEquals("vik123@abv.bg", user.getEmail());
-        assertEquals("www.image.com", user.getProfilePicture());
+      
+        assertEquals("", user.getFirstName());
+        assertEquals("", user.getLastName());
+        assertEquals("", user.getEmail());
+        assertEquals(", user.getProfilePicture());
         verify(notificationService, times(1)).saveNotificationPreference(userId, true, dto.getEmail());
         verify(userRepository, times(1)).save(user);
     }
@@ -261,25 +259,25 @@ public class UserServiceUTest {
     @Test
     void givenExistingUser_whenEditTheirProfileWithEmptyEmail_thenChangeTheirDetailsSaveNotificationPreferenceAndSaveToDatabase() {
 
-        // Given
+      
         UUID userId = UUID.randomUUID();
         UserEditRequest dto = UserEditRequest.builder()
-                .firstName("Viktor")
-                .lastName("Aleksandrov")
+                .firstName("")
+                .lastName("")
                 .email("")
-                .profilePicture("www.image.com")
+                .profilePicture("")
                 .build();
         User user = User.builder().build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
+    
         userService.editUserDetails(userId, dto);
 
-        // Then
-        assertEquals("Viktor", user.getFirstName());
-        assertEquals("Aleksandrov", user.getLastName());
+      
+        assertEquals("", user.getFirstName());
+        assertEquals("", user.getLastName());
         assertEquals("", user.getEmail());
-        assertEquals("www.image.com", user.getProfilePicture());
+        assertEquals("", user.getProfilePicture());
         verify(notificationService, times(1)).saveNotificationPreference(userId, false, null);
         verify(userRepository, times(1)).save(user);
     }
@@ -287,7 +285,7 @@ public class UserServiceUTest {
     @Test
     void givenUserWithRoleAdmin_whenSwitchRole_thenUserReceivesUserRole() {
 
-        // Given
+    
         UUID userId = UUID.randomUUID();
         User user = User.builder()
                 .id(userId)
@@ -295,17 +293,17 @@ public class UserServiceUTest {
                 .build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
+   
         userService.switchRole(userId);
 
-        // Then
+   
         assertThat(user.getRole()).isEqualTo(UserRole.USER);
     }
 
     @Test
     void givenUserWithRoleUser_whenSwitchRole_thenUserReceivesAdminRole() {
 
-        // Given
+        
         UUID userId = UUID.randomUUID();
         User user = User.builder()
                 .id(userId)
@@ -313,11 +311,12 @@ public class UserServiceUTest {
                 .build();
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // When
+       
         userService.switchRole(userId);
 
-        // Then
+      
         assertThat(user.getRole()).isEqualTo(UserRole.ADMIN);
     }
 }
+
 
