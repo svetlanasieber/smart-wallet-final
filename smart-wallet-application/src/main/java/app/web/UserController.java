@@ -73,7 +73,7 @@ public class UserController {
         return new ModelAndView("redirect:/home");
     }
 
-    @PutMapping("/{id}/status") // PUT /users/{id}/status
+    @PutMapping("/{id}/status") 
     public String switchUserStatus(@PathVariable UUID id) {
 
         userService.switchStatus(id);
@@ -81,7 +81,7 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @PutMapping("/{id}/role") // PUT /users/{id}/role
+    @PutMapping("/{id}/role") 
     public String switchUserRole(@PathVariable UUID id) {
 
         userService.switchRole(id);
@@ -89,4 +89,5 @@ public class UserController {
         return "redirect:/users";
     }
 }
+
 
